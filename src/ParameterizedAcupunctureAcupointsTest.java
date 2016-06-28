@@ -21,19 +21,21 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class ParameterizedTranslationTest {
+public class ParameterizedAcupunctureAcupointsTest {
 	private WebDriver driver;
 	private String baseUrl;
 	private StringBuffer verificationErrors = new StringBuffer();
 	private String datum;
 	
-	public ParameterizedTranslationTest(String datum){
+	public ParameterizedAcupunctureAcupointsTest(String datum){
 		this.datum = datum;
 	}
 	
 	@Parameters(name = "{index}: {0}")
 	public static Collection<String> generateData(){
-		InputStream inputStream = ParameterizedTranslationTest.class.getClassLoader().getResourceAsStream("diagnosis_tcm_treatment_priciples.csv");
+		InputStream inputStream = ParameterizedAcupunctureAcupointsTest
+				.class.getClassLoader()
+				.getResourceAsStream("acupuncture_acupoints.csv");
 
 		 BufferedReader br = null;
 		 String line = "";
@@ -46,7 +48,7 @@ public class ParameterizedTranslationTest {
 		
 			        // use comma as separator
 					String[] country = line.split(cvsSplitBy);
-					String name = country[0] + "-"+ country[1];
+					String name = country[0] + " "+ country[1];
 					list.add(name + ", " + country[2]);
 				}
 		} catch (FileNotFoundException e) {
@@ -92,21 +94,24 @@ public class ParameterizedTranslationTest {
 	    driver.findElement(By.id("ui-id-2")).click();
 	    driver.findElement(By.id("consult-done")).click();
 	    driver.findElement(By.id("next-button")).click();
-	    driver.findElement(By.xpath("//div[@id='ui-accordion-accordionDgTtm-header-0']/span")).click();
+	    driver.findElement(By.id("dia-done")).click();
+	    driver.findElement(By.linkText("TCM Acupuncture/Moxibustion Treatment 针灸疗法/艾灸疗法")).click();
+	    driver.findElement(By.id("addNew")).click();
 	    }
 	
 	@Test
 	public void testDiagnosisTreatment() {
-
-		driver.findElement(By.id("ttp1")).clear();
-		driver.findElement(By.id("ttp1")).sendKeys(getCode(datum));
-	    driver.findElement(By.id("ttp2")).click();
-	    getWhenVisible(By.id("ui-id-12"), 5);
-	    driver.findElement(By.id("ttp1")).click();  		
-	    WebElement menu = getWhenVisible(By.id("ui-id-11"), 5);
+		System.out.println("datum: " + datum);
+	    driver.findElement(By.id("taacupoint")).click();
+		driver.findElement(By.id("taacupoint")).sendKeys(getCode(datum));
+	    driver.findElement(By.id("TreatmentAcuAdd_comment")).click();
+		driver.findElement(By.id("TreatmentAcuAdd_comment")).sendKeys(datum);
+	    driver.findElement(By.id("taacupoint")).click();
+	    WebElement menu = getWhenVisible(By.id("ui-id-3"), 5);
 	    String mySelectElm = menu.getAttribute("innerText");
+	    System.out.println(mySelectElm);
 	    assertTrue(mySelectElm.contains(getData(datum)));
-		driver.findElement(By.id("ttp1")).clear();
+		driver.findElement(By.id("taacupoint")).clear();
 	}
 	
 	@After	
@@ -124,15 +129,18 @@ public class ParameterizedTranslationTest {
 		element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
 		return element;
 	}
-  
+
 	public String getData(String data){
-		int n = data.indexOf(",");		
-		return data.substring(0, n-1);
+		int n = data.indexOf(",");
+		String s = data.substring(0,n-3);
+		System.out.println("code:" + s);
+		return s;
 	}
 	
 	public String getCode(String data){
-		int n = data.indexOf(",");
-		int end = data.length();
-		return data.substring(n+2,end);
+		int n = data.indexOf(",");		
+		String s = data.substring(n-2, n);
+		System.out.println("data:" + s);
+		return s;
 	}
 }
