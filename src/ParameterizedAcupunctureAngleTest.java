@@ -21,21 +21,21 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class ParameterizedAcupunctureAcupointsTest {
+public class ParameterizedAcupunctureAngleTest {
 	private WebDriver driver;
 	private String baseUrl;
 	private StringBuffer verificationErrors = new StringBuffer();
 	private String datum;
 	
-	public ParameterizedAcupunctureAcupointsTest(String datum){
+	public ParameterizedAcupunctureAngleTest(String datum){
 		this.datum = datum;
 	}
 	
 	@Parameters(name = "{index}: {0}")
 	public static Collection<String> generateData(){
-		InputStream inputStream = ParameterizedAcupunctureAcupointsTest
+		InputStream inputStream = ParameterizedAcupunctureAngleTest
 				.class.getClassLoader()
-				.getResourceAsStream("acupuncture_acupoints.csv");
+				.getResourceAsStream("acupuncture_angle.csv");
 
 		 BufferedReader br = null;
 		 String line = "";
@@ -102,12 +102,9 @@ public class ParameterizedAcupunctureAcupointsTest {
 	@Test
 	public void testDiagnosisTreatment() {
 		System.out.println("datum: " + datum);
-	    driver.findElement(By.id("taacupoint")).click();
-		driver.findElement(By.id("taacupoint")).sendKeys(getCode(datum));
-	    driver.findElement(By.id("TreatmentAcuAdd_comment")).click();
-		driver.findElement(By.id("TreatmentAcuAdd_comment")).sendKeys(datum);
-	    driver.findElement(By.id("taacupoint")).click();
-	    WebElement menu = getWhenVisible(By.id("ui-id-3"), 5);
+	    driver.findElement(By.id("s2id_TreatmentAcuAdd_angle_id")).click();
+		driver.findElement(By.id("s2id_autogen28_search")).sendKeys(getCode(datum));
+	    WebElement menu = getWhenVisible(By.id("select2-results-28"), 5);
 	    String mySelectElm = menu.getAttribute("innerText");
 	    System.out.println(mySelectElm);
 	    assertTrue(mySelectElm.contains(getData(datum)));
@@ -132,13 +129,16 @@ public class ParameterizedAcupunctureAcupointsTest {
 
 	public String getData(String data){
 		int n = data.indexOf(",");
-		String s = data.substring(0,n-3);
+		String s = data.substring(0,n);
+		System.out.println("data:" + s);
 		return s;
 	}
 	
 	public String getCode(String data){
-		int n = data.indexOf(",");		
-		String s = data.substring(n-2, n);
+		int n = data.indexOf(",");	
+		int end = data.length();
+		String s = data.substring(n+2, end);
+		System.out.println("code:" + s);
 		return s;
 	}
 }

@@ -21,21 +21,23 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class ParameterizedAcupunctureAcupointsTest {
+public class ParameterizedAcupunctureAcupointsTest2Fields {
 	private WebDriver driver;
 	private String baseUrl;
 	private StringBuffer verificationErrors = new StringBuffer();
 	private String datum;
 	
-	public ParameterizedAcupunctureAcupointsTest(String datum){
+	public ParameterizedAcupunctureAcupointsTest2Fields(String datum){
 		this.datum = datum;
 	}
 	
+	// "shixuan Ten Diffusions 十宣" has no pinyin code so it will cause the test to 
+	// throw an exception if included in the csv file
 	@Parameters(name = "{index}: {0}")
 	public static Collection<String> generateData(){
-		InputStream inputStream = ParameterizedAcupunctureAcupointsTest
+		InputStream inputStream = ParameterizedAcupunctureAcupointsTest2Fields
 				.class.getClassLoader()
-				.getResourceAsStream("acupuncture_acupoints.csv");
+				.getResourceAsStream("acupuncture_acupoints2Fields.csv");
 
 		 BufferedReader br = null;
 		 String line = "";
@@ -48,8 +50,8 @@ public class ParameterizedAcupunctureAcupointsTest {
 		
 			        // use comma as separator
 					String[] entry = line.split(cvsSplitBy);
-					String name = entry[0] + " "+ entry[1];
-					list.add(name + ", " + entry[2]);
+					String name = entry[0] + ", "+ entry[1];
+					list.add(name);
 				}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -107,7 +109,7 @@ public class ParameterizedAcupunctureAcupointsTest {
 	    driver.findElement(By.id("TreatmentAcuAdd_comment")).click();
 		driver.findElement(By.id("TreatmentAcuAdd_comment")).sendKeys(datum);
 	    driver.findElement(By.id("taacupoint")).click();
-	    WebElement menu = getWhenVisible(By.id("ui-id-3"), 5);
+	    WebElement menu = getWhenVisible(By.id("ui-id-3"), 10);
 	    String mySelectElm = menu.getAttribute("innerText");
 	    System.out.println(mySelectElm);
 	    assertTrue(mySelectElm.contains(getData(datum)));
@@ -131,14 +133,17 @@ public class ParameterizedAcupunctureAcupointsTest {
 	}
 
 	public String getData(String data){
-		int n = data.indexOf(",");
-		String s = data.substring(0,n-3);
+		int n = data.indexOf(",");	
+		String s = data.substring(0, n);
+		System.out.println("Data: "+s);
 		return s;
 	}
 	
 	public String getCode(String data){
-		int n = data.indexOf(",");		
-		String s = data.substring(n-2, n);
+		int end = data.length();
+		int n = data.indexOf(",");	
+		String s = data.substring(n+2,end);
+		System.out.println("Code: "+s);
 		return s;
 	}
 }

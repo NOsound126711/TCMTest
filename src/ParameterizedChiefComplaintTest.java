@@ -21,21 +21,21 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class ParameterizedAcupunctureAcupointsTest {
+public class ParameterizedChiefComplaintTest {
 	private WebDriver driver;
 	private String baseUrl;
 	private StringBuffer verificationErrors = new StringBuffer();
 	private String datum;
 	
-	public ParameterizedAcupunctureAcupointsTest(String datum){
+	public ParameterizedChiefComplaintTest(String datum){
 		this.datum = datum;
 	}
 	
 	@Parameters(name = "{index}: {0}")
 	public static Collection<String> generateData(){
-		InputStream inputStream = ParameterizedAcupunctureAcupointsTest
+		InputStream inputStream = ParameterizedChiefComplaintTest
 				.class.getClassLoader()
-				.getResourceAsStream("acupuncture_acupoints.csv");
+				.getResourceAsStream("initial_consultation_chief_complaint.csv");
 
 		 BufferedReader br = null;
 		 String line = "";
@@ -48,7 +48,7 @@ public class ParameterizedAcupunctureAcupointsTest {
 		
 			        // use comma as separator
 					String[] entry = line.split(cvsSplitBy);
-					String name = entry[0] + " "+ entry[1];
+					String name = entry[0] + "-"+ entry[1];
 					list.add(name + ", " + entry[2]);
 				}
 		} catch (FileNotFoundException e) {
@@ -88,30 +88,23 @@ public class ParameterizedAcupunctureAcupointsTest {
 		driver.findElement(By.cssSelector("#yw2 > li.records-icn > a[title=\"Records\"]")).click();
 	    driver.findElement(By.xpath("//div[@id='dashboard']/ul/li[2]/a/div/img")).click();
 	    driver.findElement(By.cssSelector("td.text-center.rec-icn > a > img")).click();
-	    driver.findElement(By.id("FormConsultation_chief_complain")).clear();
-	    driver.findElement(By.id("FormConsultation_chief_complain")).sendKeys("Test");
-	    driver.findElement(By.id("tcm_disease_id")).click();
-	    driver.findElement(By.id("ui-id-2")).click();
-	    driver.findElement(By.id("consult-done")).click();
-	    driver.findElement(By.id("next-button")).click();
-	    driver.findElement(By.id("dia-done")).click();
-	    driver.findElement(By.linkText("TCM Acupuncture/Moxibustion Treatment 针灸疗法/艾灸疗法")).click();
-	    driver.findElement(By.id("addNew")).click();
 	    }
 	
 	@Test
 	public void testDiagnosisTreatment() {
-		System.out.println("datum: " + datum);
-	    driver.findElement(By.id("taacupoint")).click();
-		driver.findElement(By.id("taacupoint")).sendKeys(getCode(datum));
-	    driver.findElement(By.id("TreatmentAcuAdd_comment")).click();
-		driver.findElement(By.id("TreatmentAcuAdd_comment")).sendKeys(datum);
-	    driver.findElement(By.id("taacupoint")).click();
-	    WebElement menu = getWhenVisible(By.id("ui-id-3"), 5);
+		System.out.println("datum: "+datum);
+		getCode(datum);
+		getData(datum);
+		driver.findElement(By.id("tcm_disease_id")).clear();
+		driver.findElement(By.id("tcm_disease_id")).sendKeys(getCode(datum));
+		driver.findElement(By.id("FormConsultation_chief_complain")).clear();
+	    driver.findElement(By.id("FormConsultation_chief_complain")).sendKeys("Test");
+	    driver.findElement(By.id("tcm_disease_id")).click();  		
+	    WebElement menu = getWhenVisible(By.id("ui-id-1"), 10);
 	    String mySelectElm = menu.getAttribute("innerText");
 	    System.out.println(mySelectElm);
 	    assertTrue(mySelectElm.contains(getData(datum)));
-		driver.findElement(By.id("taacupoint")).clear();
+		driver.findElement(By.id("tcm_disease_id")).clear();		
 	}
 	
 	@After	
@@ -129,16 +122,19 @@ public class ParameterizedAcupunctureAcupointsTest {
 		element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
 		return element;
 	}
-
+  
 	public String getData(String data){
-		int n = data.indexOf(",");
-		String s = data.substring(0,n-3);
+		int n = data.indexOf(",");		
+		String s = data.substring(0, n);
+		System.out.println("data: "+s);
 		return s;
 	}
 	
 	public String getCode(String data){
-		int n = data.indexOf(",");		
-		String s = data.substring(n-2, n);
+		int n = data.indexOf(",");
+		int end = data.length();
+		String s = data.substring(n+2,end);
+		System.out.println("code: "+ s);
 		return s;
 	}
 }
