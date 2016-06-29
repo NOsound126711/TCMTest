@@ -102,6 +102,7 @@ public class ParameterizedDiagnosisZungfuTest {
 		driver.findElement(By.id("tcm_zangfu_id_1")).clear();
 		driver.findElement(By.id("tcm_zangfu_id_1")).sendKeys(getCode(datum));
 	    driver.findElement(By.id("tcm_d_id_1")).click();
+		driver.findElement(By.id("tcm_d_id_1")).sendKeys("b");
 	    getWhenVisible(By.id("ui-id-8"), 5);
 	    driver.findElement(By.id("tcm_zangfu_id_1")).click();  		
 	    WebElement menu = getWhenVisible(By.id("ui-id-1"), 10);

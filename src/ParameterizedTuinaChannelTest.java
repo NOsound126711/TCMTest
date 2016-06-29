@@ -13,6 +13,9 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import junit.framework.AssertionFailedError;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,19 +24,21 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class ParameterizedDiagnosisTranslationPrinciplesTest {
+public class ParameterizedTuinaChannelTest {
 	private WebDriver driver;
 	private String baseUrl;
 	private StringBuffer verificationErrors = new StringBuffer();
 	private String datum;
 	
-	public ParameterizedDiagnosisTranslationPrinciplesTest(String datum){
+	public ParameterizedTuinaChannelTest(String datum){
 		this.datum = datum;
 	}
 	
 	@Parameters(name = "{index}: {0}")
 	public static Collection<String> generateData(){
-		InputStream inputStream = ParameterizedDiagnosisTranslationPrinciplesTest.class.getClassLoader().getResourceAsStream("diagnosis_tcm_treatment_priciples.csv");
+		InputStream inputStream = ParameterizedTuinaChannelTest
+				.class.getClassLoader()
+				.getResourceAsStream("tuina_channel.csv");
 
 		 BufferedReader br = null;
 		 String line = "";
@@ -46,7 +51,7 @@ public class ParameterizedDiagnosisTranslationPrinciplesTest {
 		
 			        // use comma as separator
 					String[] entry = line.split(cvsSplitBy);
-					String name = entry[0] + "-"+ entry[1].trim();
+					String name = entry[0].trim() + " "+ entry[1].trim();
 					list.add(name + ", " + entry[2]);
 				}
 		} catch (FileNotFoundException e) {
@@ -92,23 +97,25 @@ public class ParameterizedDiagnosisTranslationPrinciplesTest {
 	    driver.findElement(By.id("ui-id-2")).click();
 	    driver.findElement(By.id("consult-done")).click();
 	    driver.findElement(By.id("next-button")).click();
-	    driver.findElement(By.xpath("//div[@id='ui-accordion-accordionDgTtm-header-0']/span")).click();
+	    driver.findElement(By.id("dia-done")).click();
+	    driver.findElement(By.linkText("TCM Tuina Treatment 中医推拿医疗")).click();
+	    driver.findElement(By.id("addNewTunia")).click();
 	    }
 	
 	@Test
 	public void testDiagnosisTreatment() {
-		System.out.println("datum: "+datum);
-		driver.findElement(By.id("ttp1")).clear();
-		driver.findElement(By.id("ttp1")).sendKeys(getCode(datum));
-	    driver.findElement(By.id("ttp2")).click();
-		driver.findElement(By.id("ttp2")).sendKeys("pc");
-	    getWhenVisible(By.id("ui-id-12"), 5);
-	    driver.findElement(By.id("ttp1")).click();  		
-	    WebElement menu = getWhenVisible(By.id("ui-id-11"), 10);
+		System.out.println("datum: " + datum);
+	    driver.findElement(By.id("tuinachannel")).click();
+		driver.findElement(By.id("tuinachannel")).sendKeys(getCode(datum));
+	    driver.findElement(By.id("tuinamanipulation")).click();
+	    driver.findElement(By.id("tuinamanipulation")).sendKeys("rf");
+	    getWhenVisible(By.id("ui-id-9"), 5);
+	    driver.findElement(By.id("tuinachannel")).click();
+	    WebElement menu = getWhenVisible(By.id("ui-id-8"), 5);
 	    String mySelectElm = menu.getAttribute("innerText");
 	    System.out.println(mySelectElm);
 	    assertTrue(mySelectElm.contains(getData(datum)));
-		driver.findElement(By.id("ttp1")).clear();
+		driver.findElement(By.id("tuinachannel")).clear();
 	}
 	
 	@After	
@@ -126,18 +133,17 @@ public class ParameterizedDiagnosisTranslationPrinciplesTest {
 		element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
 		return element;
 	}
-  
+
 	public String getData(String data){
 		int n = data.indexOf(",");
-		String s = data.substring(0, n);
+		String s = data.substring(0,n);
 		System.out.println("data: "+s);
 		return s;
 	}
 	
 	public String getCode(String data){
-		int n = data.indexOf(",");
-		int end = data.length();
-		String s = data.substring(n+2,end);
+		int n = data.indexOf(",");		
+		String s = data.substring(n+2, data.length());
 		System.out.println("code: "+s);
 		return s;
 	}

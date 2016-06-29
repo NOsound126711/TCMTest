@@ -35,7 +35,7 @@ public class ParameterizedChiefComplaintTest {
 	public static Collection<String> generateData(){
 		InputStream inputStream = ParameterizedChiefComplaintTest
 				.class.getClassLoader()
-				.getResourceAsStream("initial_consultation_chief_complaint.csv");
+				.getResourceAsStream("initial_consultation_chief_complaintd.csv");
 
 		 BufferedReader br = null;
 		 String line = "";
@@ -93,8 +93,6 @@ public class ParameterizedChiefComplaintTest {
 	@Test
 	public void testDiagnosisTreatment() {
 		System.out.println("datum: "+datum);
-		getCode(datum);
-		getData(datum);
 		driver.findElement(By.id("tcm_disease_id")).clear();
 		driver.findElement(By.id("tcm_disease_id")).sendKeys(getCode(datum));
 		driver.findElement(By.id("FormConsultation_chief_complain")).clear();
