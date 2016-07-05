@@ -56,7 +56,7 @@ public class ParameterizedTreatmentFormulaTest {
 		
 			        // use comma as separator
 					String[] entry = line.split(cvsSplitBy);
-					String name = entry[0] + " "+ entry[1];
+					String name = entry[0] + "-"+ entry[1];
 					list.add(name + ", " + entry[2]);
 				}
 		} catch (FileNotFoundException e) {
@@ -117,7 +117,7 @@ public class ParameterizedTreatmentFormulaTest {
 	    driver.findElement(By.id("formula_comments")).clear();
 		driver.findElement(By.id("formula_comments")).sendKeys(datum);
 	    driver.findElement(By.id("tff")).click();
-	    WebElement menu = getWhenVisible(By.id("ui-id-3"), 5);
+	    WebElement menu = getWhenVisible(By.id("ui-id-7"), 5);
 	    String mySelectElm = menu.getAttribute("innerText");
 	    System.out.println(mySelectElm);
 	    assertTrue(mySelectElm.contains(getData(datum)));
