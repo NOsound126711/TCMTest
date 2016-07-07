@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +30,7 @@ public class ParameterizedDiagnosisZungfuTest {
 	private static String username = new AccountCred().getUserName();
 	private static String password = new AccountCred().getPassword();
 	private static String verification = new AccountCred().getVerificiationCode();
+	private static PrintWriter file; 
 	
 	public ParameterizedDiagnosisZungfuTest(String datum){
 		this.datum = datum;
@@ -75,6 +77,11 @@ public class ParameterizedDiagnosisZungfuTest {
 
  	@BeforeClass
  	public static void setUp() throws Exception {
+ 		try {
+			file = new PrintWriter("Diagnosis_Zungfu_Results.txt");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
  		driver = new FirefoxDriver();
 		baseUrl = "http://dev.credencys.com/";
 		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
@@ -109,16 +116,29 @@ public class ParameterizedDiagnosisZungfuTest {
 	    driver.findElement(By.id("tcm_d_id_1")).clear();
 		driver.findElement(By.id("tcm_d_id_1")).sendKeys("b");
 	    getWhenVisible(By.id("ui-id-8"), 5);
-	    driver.findElement(By.id("tcm_zangfu_id_1")).click();  		
-	    WebElement menu = getWhenVisible(By.id("ui-id-1"), 10);
-	    String mySelectElm = menu.getAttribute("innerText");
-	    System.out.println(mySelectElm);
-	    assertTrue(mySelectElm.contains(getData(datum)));
-	}
+	    driver.findElement(By.id("tcm_zangfu_id_1")).click();  
+	    try{
+		    WebElement menu = getWhenVisible(By.id("ui-id-1"), 10);
+		    String mySelectElm = menu.getAttribute("innerText");
+		    System.out.println(mySelectElm);
+		    if(mySelectElm.contains(getData(datum))){
+		    	assertTrue("Entry present", true);
+		    }
+		    else{
+		    	file.println(datum+"\t"+"Entry not present");
+		    	assertFalse("Entry not present", true);
+		    }
+	    }
+	    catch(TimeoutException e){
+	    	file.println(datum+"\t"+"Window timeout");
+	    	assertFalse("Timeout while waiting for window", true);	  	    	
+	    }	
+    }
 	
 	@AfterClass	
 	public static void tearDown() throws Exception {
 		driver.quit();
+		file.close();
 		String verificationErrorString = verificationErrors.toString();
 		if (!"".equals(verificationErrorString)) {
 			fail(verificationErrorString);

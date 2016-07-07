@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +14,9 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,12 +32,14 @@ public class ParameterizedAcupunctureAcupointsTest {
 	private static String username = new AccountCred().getUserName();
 	private static String password = new AccountCred().getPassword();
 	private static String verification = new AccountCred().getVerificiationCode();
- 
-	
+	private static PrintWriter file; 
+
 	public ParameterizedAcupunctureAcupointsTest(String datum){
 		this.datum = datum;
 	}
 	
+	// "shixuan Ten Diffusions 十宣" has no pinyin code so it will cause the test to 
+	// throw an exception if included in the csv file
 	@Parameters(name = "{index}: {0}")
 	public static Collection<String> generateData(){
 		InputStream inputStream = ParameterizedAcupunctureAcupointsTest
@@ -52,8 +57,8 @@ public class ParameterizedAcupunctureAcupointsTest {
 		
 			        // use comma as separator
 					String[] entry = line.split(cvsSplitBy);
-					String name = entry[0] + " "+ entry[1];
-					list.add(name + ", " + entry[2]);
+					String name = entry[0] + ", "+ entry[1];
+					list.add(name);
 				}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -75,7 +80,13 @@ public class ParameterizedAcupunctureAcupointsTest {
 	}
 
  	@BeforeClass
- 	public static void setUp() throws Exception {
+ 	public static void setUp(){
+ 		try{
+ 			file = new PrintWriter("Acupuncture_Acupoint_Results");
+ 		}
+ 		catch(FileNotFoundException e){
+			e.printStackTrace();
+ 		}
  		driver = new FirefoxDriver();
 		baseUrl = "http://dev.credencys.com/";
 		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
@@ -107,21 +118,34 @@ public class ParameterizedAcupunctureAcupointsTest {
 	public void testDiagnosisTreatment() {
 		System.out.println("datum: " + datum);
 	    driver.findElement(By.id("taacupoint")).click();
-	    driver.findElement(By.id("taacupoint")).clear();
+		driver.findElement(By.id("taacupoint")).clear();
 		driver.findElement(By.id("taacupoint")).sendKeys(getCode(datum));
 	    driver.findElement(By.id("TreatmentAcuAdd_comment")).click();
 	    driver.findElement(By.id("TreatmentAcuAdd_comment")).clear();
 		driver.findElement(By.id("TreatmentAcuAdd_comment")).sendKeys(datum);
 	    driver.findElement(By.id("taacupoint")).click();
-	    WebElement menu = getWhenVisible(By.id("ui-id-3"), 5);
-	    String mySelectElm = menu.getAttribute("innerText");
-	    System.out.println(mySelectElm);
-	    assertTrue(mySelectElm.contains(getData(datum)));
+	    try{
+		    WebElement menu = getWhenVisible(By.id("ui-id-3"), 10);
+		    String mySelectElm = menu.getAttribute("innerText");
+		    System.out.println(mySelectElm);
+		    if(mySelectElm.contains(getData(datum))){
+		    	assertTrue("Entry present", true);
+		    }
+		    else{
+		    	file.println(datum+"\t"+"Entry not present");
+		    	assertFalse("Entry not present", true);
+		    }
+	    }
+	    catch(TimeoutException e){
+	    	file.println(datum+"\t"+"Window timeout");
+	    	assertFalse("Timeout while waiting for window", true);	  	    	
+	    }
 	}
 	
-	@AfterClass	
+	@AfterClass
 	public static void tearDown() throws Exception {
 		driver.quit();
+		file.close();
 		String verificationErrorString = verificationErrors.toString();
 		if (!"".equals(verificationErrorString)) {
 			fail(verificationErrorString);
@@ -136,14 +160,17 @@ public class ParameterizedAcupunctureAcupointsTest {
 	}
 
 	public String getData(String data){
-		int n = data.indexOf(",");
-		String s = data.substring(0,n-3);
+		int n = data.indexOf(",");	
+		String s = data.substring(0, n);
+		System.out.println("Data: "+s);
 		return s;
 	}
 	
 	public String getCode(String data){
-		int n = data.indexOf(",");		
-		String s = data.substring(n-2, n);
+		int end = data.length();
+		int n = data.indexOf(",");	
+		String s = data.substring(n+2,end);
+		System.out.println("Code: "+s);
 		return s;
 	}
 }

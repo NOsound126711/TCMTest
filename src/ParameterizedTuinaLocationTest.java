@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +18,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import junit.framework.AssertionFailedError;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,6 +35,7 @@ public class ParameterizedTuinaLocationTest {
 	private static String username = new AccountCred().getUserName();
 	private static String password = new AccountCred().getPassword();
 	private static String verification = new AccountCred().getVerificiationCode();
+	private static PrintWriter file; 
 	
 	public ParameterizedTuinaLocationTest(String datum){
 		this.datum = datum;
@@ -77,8 +80,17 @@ public class ParameterizedTuinaLocationTest {
 		return list;
 	}
 
+	@BeforeClass
+	public static void preSetUp(){
+		try {
+			file = new PrintWriter("Tuina_Location_Results.txt");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+		
  	@Before
- 	public void setUp() throws Exception {
+ 	public void setUp() throws Exception { 		
  		driver = new FirefoxDriver();
 		baseUrl = "http://dev.credencys.com/";
 		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
@@ -111,11 +123,23 @@ public class ParameterizedTuinaLocationTest {
 		System.out.println("datum: " + datum);
 	    driver.findElement(By.id("select2-chosen-33")).click();
 		driver.findElement(By.id("s2id_autogen33_search")).sendKeys(getCode(datum));
-	    WebElement menu = getWhenVisible(By.id("select2-results-33"), 5);
-	    String mySelectElm = menu.getAttribute("innerText");
-	    System.out.println(mySelectElm);
-	    assertTrue(mySelectElm.contains(getData(datum)));
-	}
+	    try{
+			WebElement menu = getWhenVisible(By.id("select2-results-33"), 5);
+		    String mySelectElm = menu.getAttribute("innerText");
+		    System.out.println(mySelectElm);
+		    if(mySelectElm.contains(getData(datum))){
+		    	assertTrue("Entry present", true);
+		    }
+		    else{
+		    	file.println(datum+"\t"+"Entry not present");
+		    	assertFalse("Entry not present", true);
+		    }
+	    }
+	    catch(TimeoutException e){
+	    	file.println(datum+"\t"+"Window timeout");
+	    	assertFalse("Timeout while waiting for window", true);	  	    	
+	    }
+    }
 	
 	@After	
 	public void tearDown() throws Exception {
@@ -124,6 +148,11 @@ public class ParameterizedTuinaLocationTest {
 		if (!"".equals(verificationErrorString)) {
 			fail(verificationErrorString);
 		}
+	}
+	
+	@AfterClass
+	public static void postTearDown(){
+		file.close();
 	}
 	
 	public WebElement getWhenVisible(By locator, int timeout) {

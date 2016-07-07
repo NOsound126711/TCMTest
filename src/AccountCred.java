@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 public class AccountCred {
 
 	public String getUserName() {
-		InputStream inputStream = ParameterizedAcupunctureAcupointsTest
+		InputStream inputStream = AccountCred
 				.class.getClassLoader()
 				.getResourceAsStream("username.csv");
 		 BufferedReader br = null;
@@ -22,7 +22,7 @@ public class AccountCred {
 	}
 	
 	public String getPassword() {
-		InputStream inputStream = ParameterizedAcupunctureAcupointsTest
+		InputStream inputStream = AccountCred
 				.class.getClassLoader()
 				.getResourceAsStream("password.csv");
 		 BufferedReader br = null;
@@ -37,7 +37,7 @@ public class AccountCred {
 	}
 
 	public String getVerificiationCode() {
-		InputStream inputStream = ParameterizedAcupunctureAcupointsTest
+		InputStream inputStream = AccountCred
 				.class.getClassLoader()
 				.getResourceAsStream("verification.csv");
 		 BufferedReader br = null;
