@@ -15,8 +15,6 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import junit.framework.AssertionFailedError;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -82,11 +80,14 @@ public class ParameterizedTuinaLocationTest {
 
 	@BeforeClass
 	public static void preSetUp(){
-		try {
-			file = new PrintWriter("Tuina_Location_Results.txt");
-		} catch (FileNotFoundException e) {
+		String name = ParameterizedTuinaLocationTest.class.getCanonicalName();
+ 		try{
+ 			file = new PrintWriter(name);
+ 		}
+ 		catch(FileNotFoundException e){
 			e.printStackTrace();
-		}
+ 		}
+ 		file.println(name);
 	}
 		
  	@Before
@@ -131,12 +132,12 @@ public class ParameterizedTuinaLocationTest {
 		    	assertTrue("Entry present", true);
 		    }
 		    else{
-		    	file.println(datum+"\t"+"Entry not present");
+		    	file.println("Entry not present: "+datum);
 		    	assertFalse("Entry not present", true);
 		    }
 	    }
 	    catch(TimeoutException e){
-	    	file.println(datum+"\t"+"Window timeout");
+	    	file.println("Window timeout: "+datum);
 	    	assertFalse("Timeout while waiting for window", true);	  	    	
 	    }
     }

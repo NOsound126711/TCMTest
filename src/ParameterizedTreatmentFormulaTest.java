@@ -82,11 +82,14 @@ public class ParameterizedTreatmentFormulaTest {
 
  	@BeforeClass
  	public static void setUp() throws Exception {
- 		try {
-			file = new PrintWriter("Treatment_Formula_Results.txt");
-		} catch (FileNotFoundException e) {
+ 		String name = ParameterizedTreatmentFormulaTest.class.getCanonicalName();
+ 		try{
+ 			file = new PrintWriter(name);
+ 		}
+ 		catch(FileNotFoundException e){
 			e.printStackTrace();
-		}
+ 		}
+ 		file.println(name);
  		driver = new FirefoxDriver();
 		baseUrl = "http://dev.credencys.com/";
 		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
@@ -132,12 +135,12 @@ public class ParameterizedTreatmentFormulaTest {
 		    	assertTrue("Entry present", true);
 		    }
 		    else{
-		    	file.println(datum+"\t"+"Entry not present");
+		    	file.println("Entry not present: "+datum);
 		    	assertFalse("Entry not present", true);
 		    }
 	    }
 	    catch(TimeoutException e){
-	    	file.println(datum+"\t"+"Window timeout");
+	    	file.println("Window timeout: "+datum);
 	    	assertFalse("Timeout while waiting for window", true);	  	    	
 	    }
     }

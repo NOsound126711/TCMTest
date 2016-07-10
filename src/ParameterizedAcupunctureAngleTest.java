@@ -79,11 +79,14 @@ public class ParameterizedAcupunctureAngleTest {
 
 	@BeforeClass
 	public static void preSetUp(){
- 		try {
-			file = new PrintWriter("Acupuncture_Angle_Results.txt");
-		} catch (FileNotFoundException e) {
+ 		String name = ParameterizedAcupunctureAngleTest.class.getCanonicalName();
+ 		try{
+ 			file = new PrintWriter(name);
+ 		}
+ 		catch(FileNotFoundException e){
 			e.printStackTrace();
-		}
+ 		}
+ 		file.println(name);
 	}
 	
  	@Before
@@ -128,12 +131,12 @@ public class ParameterizedAcupunctureAngleTest {
 		    	assertTrue("Entry present", true);
 		    }
 		    else{
-		    	file.println(datum+"\t"+"Entry not present");
+		    	file.println("Entry not present: "+datum);
 		    	assertFalse("Entry not present", true);
 		    }
 	    }
 	    catch(TimeoutException e){
-	    	file.println(datum+"\t"+"Window timeout");
+	    	file.println("Window timeout: "+datum);
 	    	assertFalse("Timeout while waiting for window", true);	  	    	
 	    }
 	}
