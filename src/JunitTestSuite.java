@@ -4,7 +4,6 @@ import org.junit.runners.Suite;
 @ RunWith(Suite.class)
 @ Suite.SuiteClasses({
 	ParameterizedAcupunctureAcupointsTest.class,
-	ParameterizedAcupunctureAcupointsTestShinxuanTenDiffusions.class,
 	ParameterizedChiefComplaintTest.class,
 	ParameterizedDiagnosis6Test.class,
 	ParameterizedDiagnosisTranslationPrinciplesTest.class,

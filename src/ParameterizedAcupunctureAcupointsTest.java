@@ -14,9 +14,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +24,6 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class ParameterizedAcupunctureAcupointsTest {
 	private static WebDriver driver;
-	private static String baseUrl;
 	private static StringBuffer verificationErrors = new StringBuffer();
 	private String datum;
 	private static String username = new AccountCred().getUserName();
@@ -38,8 +35,8 @@ public class ParameterizedAcupunctureAcupointsTest {
 		this.datum = datum;
 	}
 	
-	// "shixuan Ten Diffusions 十宣" has no pinyin code so it will cause the test to 
-	// throw an exception if included in the csv file
+	// "luozhen Stiff Neck 落枕	" has no pinyin code so it will cause the test to 
+	// throw an exception
 	@Parameters(name = "{index}: {0}")
 	public static Collection<String> generateData(){
 		InputStream inputStream = ParameterizedAcupunctureAcupointsTest
@@ -83,14 +80,13 @@ public class ParameterizedAcupunctureAcupointsTest {
  	public static void setUp(){
  		String name = ParameterizedAcupunctureAcupointsTest.class.getCanonicalName();
  		try{
- 			file = new PrintWriter(name);
+ 			file = new PrintWriter(name+".txt");
  		}
  		catch(FileNotFoundException e){
 			e.printStackTrace();
  		}
- 		file.println(name);
+ 		file.println(name+" "+new java.util.Date()+"\n");
  		driver = new FirefoxDriver();
-		baseUrl = "http://dev.credencys.com/";
 		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 		driver.get("http://dev.credencys.com/" + "tcm/index.php/site/login");
 		driver.findElement(By.id("LoginForm_username")).clear();
@@ -147,6 +143,7 @@ public class ParameterizedAcupunctureAcupointsTest {
 	@AfterClass
 	public static void tearDown() throws Exception {
 		driver.quit();
+		file.println();
 		file.close();
 		String verificationErrorString = verificationErrors.toString();
 		if (!"".equals(verificationErrorString)) {

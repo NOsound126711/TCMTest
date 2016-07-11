@@ -26,7 +26,6 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class ParameterizedAcupunctureAngleTest {
 	private static WebDriver driver;
-	private static String baseUrl;
 	private static StringBuffer verificationErrors = new StringBuffer();
 	private String datum;
 	private static String username = new AccountCred().getUserName();
@@ -81,18 +80,13 @@ public class ParameterizedAcupunctureAngleTest {
 	public static void preSetUp(){
  		String name = ParameterizedAcupunctureAngleTest.class.getCanonicalName();
  		try{
- 			file = new PrintWriter(name);
+ 			file = new PrintWriter(name+".txt");
  		}
  		catch(FileNotFoundException e){
 			e.printStackTrace();
  		}
- 		file.println(name);
-	}
-	
- 	@Before
- 	public void setUp() throws Exception {
+ 		file.println(name+" "+new java.util.Date()+"\n");
  		driver = new FirefoxDriver();
-		baseUrl = "http://dev.credencys.com/";
 		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 		driver.get("http://dev.credencys.com/" + "tcm/index.php/site/login");
 		driver.findElement(By.id("LoginForm_username")).clear();
@@ -104,8 +98,12 @@ public class ParameterizedAcupunctureAngleTest {
 		driver.findElement(By.id("LoginForm_verificationCode")).clear();
 		driver.findElement(By.id("LoginForm_verificationCode")).sendKeys(verification);
 		driver.findElement(By.name("yt0")).click();	  
-		driver.findElement(By.cssSelector("#yw2 > li.records-icn > a[title=\"Records\"]")).click();
-	    driver.findElement(By.xpath("//div[@id='dashboard']/ul/li[2]/a/div/img")).click();
+		driver.findElement(By.cssSelector("#yw2 > li.records-icn > a[title=\"Records\"]")).click();	    
+	}
+	
+ 	@Before
+ 	public void setUp() throws Exception {
+ 		driver.findElement(By.xpath("//div[@id='dashboard']/ul/li[2]/a/div/img")).click();
 	    driver.findElement(By.cssSelector("td.text-center.rec-icn > a > img")).click();
 	    driver.findElement(By.id("FormConsultation_chief_complain")).clear();
 	    driver.findElement(By.id("FormConsultation_chief_complain")).sendKeys("Test");
@@ -143,16 +141,18 @@ public class ParameterizedAcupunctureAngleTest {
 	
 	@After	
 	public void tearDown() throws Exception {
+		driver.get("http://dev.credencys.com/tcm/index.php/site/index");
+	}
+	
+	@AfterClass
+	public static void postTearDown(){
+		file.println();
+		file.close();
 		driver.quit();
 		String verificationErrorString = verificationErrors.toString();
 		if (!"".equals(verificationErrorString)) {
 			fail(verificationErrorString);
 		}
-	}
-	
-	@AfterClass
-	public static void postTearDown(){
-		file.close();
 	}
 	
 	public WebElement getWhenVisible(By locator, int timeout) {

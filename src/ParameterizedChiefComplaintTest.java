@@ -14,9 +14,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +24,6 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class ParameterizedChiefComplaintTest {
 	private static WebDriver driver;
-	private static String baseUrl;
 	private static StringBuffer verificationErrors = new StringBuffer();
 	private String datum;
 	private static String username = new AccountCred().getUserName();
@@ -42,7 +39,7 @@ public class ParameterizedChiefComplaintTest {
 	public static Collection<String> generateData(){
 		InputStream inputStream = ParameterizedChiefComplaintTest
 				.class.getClassLoader()
-				.getResourceAsStream("Initial_Consultation_Chief_Complaint.csv");
+				.getResourceAsStream("initial_consultation_chief_complaint.csv");
 
 		 BufferedReader br = null;
 		 String line = "";
@@ -81,14 +78,13 @@ public class ParameterizedChiefComplaintTest {
  	public static void setUp() throws Exception {
  		String name = ParameterizedChiefComplaintTest.class.getCanonicalName();
  		try{
- 			file = new PrintWriter(name);
+ 			file = new PrintWriter(name+".txt");
  		}
  		catch(FileNotFoundException e){
 			e.printStackTrace();
  		}
- 		file.println(name);
+ 		file.println(name+" "+new java.util.Date()+"\n");
  		driver = new FirefoxDriver();
-		baseUrl = "http://dev.credencys.com/";
 		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 		driver.get("http://dev.credencys.com/" + "tcm/index.php/site/login");
 		driver.findElement(By.id("LoginForm_username")).clear();
@@ -134,6 +130,7 @@ public class ParameterizedChiefComplaintTest {
 	@AfterClass	
 	public static void tearDown() throws Exception {
 		driver.quit();
+		file.println();
 		file.close();
 		String verificationErrorString = verificationErrors.toString();
 		if (!"".equals(verificationErrorString)) {
